@@ -24,12 +24,20 @@ export const schema = new GraphQLSchema({
         args: {
           patientsSortDirection: {
             type: GraphQLString
+          },
+          countrySortDirection: {
+            type: GraphQLString
           }
         },
-        resolve: (_, { patientsSortDirection }) => {
+        resolve: (_, { patientsSortDirection, countrySortDirection }) => {
           let baseQuery = queryBuilder("clinical_trial");
-          if (patientsSortDirection !== null) {
+          if (patientsSortDirection !== null && patientsSortDirection !== undefined) {
             baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
+            return baseQuery.select();
+          }
+          if (countrySortDirection !== null  && countrySortDirection !== undefined) {
+            baseQuery = baseQuery.orderBy("country", countrySortDirection);
+            return baseQuery.select();
           }
           return baseQuery.select();
         }

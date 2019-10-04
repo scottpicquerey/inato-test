@@ -3,7 +3,7 @@ import React, { Fragment, useCallback } from "react";
 import * as _ from "lodash"
 
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
-import { PatientsSortDirection } from "./App";
+import { SortDirection } from "./App";
 
 const Table = styled.div`
   border-collapse: separate;
@@ -59,26 +59,41 @@ const Cell = styled.div`
 
 interface Props {
   clinicalTrials: AppQueryResponse["clinicalTrials"];
-  patientsSortDirection: PatientsSortDirection;
+  patientsSortDirection: SortDirection;
   setPatientsSortDirection: (
-    patientsSortDirection: PatientsSortDirection
+    patientsSortDirection: SortDirection
+  ) => void;
+  countrySortDirection: SortDirection;
+  setCountrySortDirection: (
+    countrySortDirection: SortDirection
   ) => void;
 }
 
 const ClinicalTrials: React.FC<Props> = ({
   clinicalTrials,
   patientsSortDirection,
-  setPatientsSortDirection
+  setPatientsSortDirection,
+  countrySortDirection,
+  setCountrySortDirection
 }: Props) => {
-  const togglePatientsSortDirection = useCallback(() => {
-    if (patientsSortDirection == null) {
-      setPatientsSortDirection("asc");
-    } else if (patientsSortDirection === "asc") {
-      setPatientsSortDirection("desc");
-    } else {
-      setPatientsSortDirection(null);
+  const toggleSortDirection = useCallback((columnName: string) => {
+    if (columnName === "patients") {
+      sortColumnDirection(patientsSortDirection, setPatientsSortDirection, setCountrySortDirection)
+    } else if (columnName === "country") {
+      sortColumnDirection(countrySortDirection, setCountrySortDirection, setPatientsSortDirection)
     }
-  }, [patientsSortDirection, setPatientsSortDirection]);
+  }, [patientsSortDirection, setPatientsSortDirection, countrySortDirection, setCountrySortDirection]);
+
+  const sortColumnDirection = (columnDirection: string | null, setColumnSortDirection: Function, setOtherColumnSortDirection: Function) => {
+    if (columnDirection == null) {
+      setColumnSortDirection("asc");
+    } else if (columnDirection === "asc") {
+      setColumnSortDirection("desc");
+    } else {
+      setColumnSortDirection(null);
+    }
+    setOtherColumnSortDirection(null)
+  };
 
   return (
     <Fragment>
@@ -87,8 +102,10 @@ const ClinicalTrials: React.FC<Props> = ({
         <Header>
           <HeaderCell>site</HeaderCell>
           <HeaderCell>city</HeaderCell>
-          <HeaderCell>country</HeaderCell>
-          <ClickableHeaderCell onClick={togglePatientsSortDirection}>
+          <ClickableHeaderCell onClick={() => {toggleSortDirection("country")}}>
+            country{sortDirectionIndicator(countrySortDirection)}
+          </ClickableHeaderCell>
+          <ClickableHeaderCell onClick={() => {toggleSortDirection("patients")}}>
             patients{sortDirectionIndicator(patientsSortDirection)}
           </ClickableHeaderCell>
         </Header>
@@ -108,10 +125,10 @@ const ClinicalTrials: React.FC<Props> = ({
 };
 
 const sortDirectionIndicator = (
-  patientsSortDirection: PatientsSortDirection
+  columnName: string | null
 ) => {
-  if (patientsSortDirection === "asc") return "↑";
-  if (patientsSortDirection === "desc") return "↓";
+  if (columnName === "asc") return "↑";
+  if (columnName === "desc") return "↓";
   return "";
 };
 
