@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import React, { Fragment, useCallback } from "react";
+import * as _ from "lodash"
 
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 import { PatientsSortDirection } from "./App";
@@ -85,6 +86,7 @@ const ClinicalTrials: React.FC<Props> = ({
       <Table>
         <Header>
           <HeaderCell>site</HeaderCell>
+          <HeaderCell>city</HeaderCell>
           <HeaderCell>country</HeaderCell>
           <ClickableHeaderCell onClick={togglePatientsSortDirection}>
             patients{sortDirectionIndicator(patientsSortDirection)}
@@ -94,6 +96,7 @@ const ClinicalTrials: React.FC<Props> = ({
           {clinicalTrials.map(clinicalTrial => (
             <Row key={clinicalTrial.site}>
               <Cell>{clinicalTrial.site}</Cell>
+              <Cell>{_.capitalize(clinicalTrial.city)}</Cell>
               <Cell>{clinicalTrial.country}</Cell>
               <Cell>{clinicalTrial.patients}</Cell>
             </Row>
