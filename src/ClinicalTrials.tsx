@@ -1,61 +1,20 @@
-import styled from "styled-components";
 import React, { Fragment, useCallback } from "react";
-import * as _ from "lodash"
+import _ from "lodash";
 
+import {
+  Table,
+  Header,
+  Body,
+  Row,
+  HeaderCell,
+  ClickableHeaderCell,
+  Cell,
+  CountrySelector,
+  CountryInput,
+  CountrySelectorBtn
+} from "./style"
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
-import { SortDirection } from "./App";
-
-const Table = styled.div`
-  border-collapse: separate;
-  border-spacing: 0px 8px;
-  display: table;
-`;
-
-const Header = styled.div`
-  display: table-header-group;
-`;
-
-const Body = styled.div`
-  display: table-row-group;
-`;
-
-const Row = styled.div`
-  display: table-row;
-`;
-
-const HeaderCell = styled.div`
-  display: table-cell;
-  padding: 8px 32px;
-  border-radius: 4px;
-`;
-
-const ClickableHeaderCell = styled(HeaderCell)`
-  cursor: pointer;
-  &:hover {
-    background-color: #b5b6ba;
-  }
-`;
-
-const Cell = styled.div`
-  --border-color: #eaedf1;
-  display: table-cell;
-  vertical-align: middle;
-  padding: 16px 32px;
-  background: #ffffff;
-  border-width: 1px;
-  border-style: solid none;
-  border-color: var(--border-color);
-
-  &:first-child {
-    border-left: 1px solid var(--border-color);
-    border-radius: 4px 0 0 4px;
-  }
-
-  &:last-child {
-    border-right: 1px solid var(--border-color);
-    border-radius: 0 4px 4px 0;
-  }
-`;
+import { SortDirection, Country } from "./App";
 
 interface Props {
   clinicalTrials: AppQueryResponse["clinicalTrials"];
@@ -67,6 +26,9 @@ interface Props {
   setCountrySortDirection: (
     countrySortDirection: SortDirection
   ) => void;
+  setCountry: (
+    country: Country
+  ) => void;
 }
 
 const ClinicalTrials: React.FC<Props> = ({
@@ -74,7 +36,8 @@ const ClinicalTrials: React.FC<Props> = ({
   patientsSortDirection,
   setPatientsSortDirection,
   countrySortDirection,
-  setCountrySortDirection
+  setCountrySortDirection,
+  setCountry
 }: Props) => {
   const toggleSortDirection = useCallback((columnName: string) => {
     if (columnName === "patients") {
@@ -84,20 +47,24 @@ const ClinicalTrials: React.FC<Props> = ({
     }
   }, [patientsSortDirection, setPatientsSortDirection, countrySortDirection, setCountrySortDirection]);
 
-  const sortColumnDirection = (columnDirection: string | null, setColumnSortDirection: Function, setOtherColumnSortDirection: Function) => {
-    if (columnDirection == null) {
-      setColumnSortDirection("asc");
-    } else if (columnDirection === "asc") {
-      setColumnSortDirection("desc");
-    } else {
-      setColumnSortDirection(null);
-    }
-    setOtherColumnSortDirection(null)
-  };
+  const toggleCountryFiltering = useCallback(() => {
+    const inputCountryValue = (document.getElementById("country-input") as HTMLInputElement).value;
+    setCountry(inputCountryValue);
+  }, [setCountry]);
 
+  const toggleResetFiltering = useCallback(() => {
+    setCountry(null);
+  }, [setCountry])
+  
   return (
     <Fragment>
       <h1>Clinical trials</h1>
+      <CountrySelector>
+        <p>Filter by country: </p>
+        <CountryInput autoComplete="off" id="country-input" placeholder="Type a country..."></CountryInput>
+        <CountrySelectorBtn onClick={toggleCountryFiltering}>Filter</CountrySelectorBtn>
+        <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
+      </CountrySelector>
       <Table>
         <Header>
           <HeaderCell>site</HeaderCell>
@@ -130,6 +97,17 @@ const sortDirectionIndicator = (
   if (columnName === "asc") return "↑";
   if (columnName === "desc") return "↓";
   return "";
+};
+
+const sortColumnDirection = (columnDirection: string | null, setColumnSortDirection: Function, setOtherColumnSortDirection: Function) => {
+  if (columnDirection == null) {
+    setColumnSortDirection("asc");
+  } else if (columnDirection === "asc") {
+    setColumnSortDirection("desc");
+  } else {
+    setColumnSortDirection(null);
+  }
+  setOtherColumnSortDirection(null)
 };
 
 export default ClinicalTrials;

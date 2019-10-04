@@ -6,6 +6,7 @@ import {
   GraphQLString
 } from "graphql";
 import { nodeDefinitions } from "graphql-relay";
+import _ from "lodash"
 
 import { ClinicalTrialType } from "./clinicalTrials";
 import { queryBuilder } from "./database";
@@ -27,17 +28,20 @@ export const schema = new GraphQLSchema({
           },
           countrySortDirection: {
             type: GraphQLString
+          },
+          country: {
+            type: GraphQLString
           }
         },
-        resolve: (_, { patientsSortDirection, countrySortDirection }) => {
+        resolve: (__, { patientsSortDirection, countrySortDirection, country }) => {
           let baseQuery = queryBuilder("clinical_trial");
-          if (patientsSortDirection !== null && patientsSortDirection !== undefined) {
-            baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
-            return baseQuery.select();
-          }
           if (countrySortDirection !== null  && countrySortDirection !== undefined) {
             baseQuery = baseQuery.orderBy("country", countrySortDirection);
-            return baseQuery.select();
+          } else if (patientsSortDirection !== null && patientsSortDirection !== undefined) {
+            baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
+          }
+          if (country !== null && country !== undefined) {
+            baseQuery.where("country", _.capitalize(country));
           }
           return baseQuery.select();
         }

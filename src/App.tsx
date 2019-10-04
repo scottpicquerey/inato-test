@@ -22,10 +22,12 @@ const Content = styled.div`
 `;
 
 export type SortDirection = 'asc' | 'desc' | null;
+export type Country = string | null;
 
 const App: React.FC = () => {
   const [patientsSortDirection, setPatientsSortDirection] = useState<SortDirection>(null);
   const [countrySortDirection, setCountrySortDirection] = useState<SortDirection>(null);
+  const [country, setCountry] = useState<string | null>(null);
 
     return (
       <Layout>
@@ -33,8 +35,8 @@ const App: React.FC = () => {
           <QueryRenderer<AppQuery>
             environment={environment}
             query={graphql`
-          query AppQuery($patientsSortDirection: String, $countrySortDirection: String)  {
-            clinicalTrials(patientsSortDirection:$patientsSortDirection, countrySortDirection:$countrySortDirection) {
+          query AppQuery($patientsSortDirection: String, $countrySortDirection: String, $country: String)  {
+            clinicalTrials(patientsSortDirection:$patientsSortDirection, countrySortDirection:$countrySortDirection, country:$country) {
               country
               patients
               site
@@ -44,7 +46,8 @@ const App: React.FC = () => {
         `}
             variables={{
               patientsSortDirection,
-              countrySortDirection
+              countrySortDirection,
+              country
             }}
             render={({props}) => {
               if (!props) {
@@ -54,6 +57,7 @@ const App: React.FC = () => {
                                      setPatientsSortDirection={setPatientsSortDirection}
                                      countrySortDirection={countrySortDirection}
                                      setCountrySortDirection={setCountrySortDirection}
+                                     setCountry={setCountry}
                                      clinicalTrials={props.clinicalTrials}/>;
             }}
           />
