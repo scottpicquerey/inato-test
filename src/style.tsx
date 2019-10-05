@@ -56,6 +56,10 @@ export const Cell = styled.div`
 export const CountrySelector = styled.div`
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    max-width: 1300px;
+    width: 100%;
+}
 `;
 
 export const CountrySelectorBtn = styled.button`
@@ -74,7 +78,7 @@ export const CountrySelectorBtn = styled.button`
 `;
 
 export const CountryTable = styled.ul`
-    width: 180px;
+    width: 230px;
     height: 35px;
     margin: 0 0 0 15px;
     outline: none;
@@ -90,7 +94,6 @@ export const CountryTable = styled.ul`
     flex-direction: column;
     align-items: center;
     justify-content: left;
-    background-color: #ffffff;
     cursor: pointer;
     padding: 0;
 `;
@@ -107,4 +110,13 @@ export const CountryCell = styled.li`
     &:not(:first-child):not(:last-child) {
         border-bottom: 1px solid grey;
     }
+`;
+
+export const SelectedCountryCell = styled(CountryCell)`
+    background-color: lightgrey;
+`;
+
+export const SelectedCountriesParagraph = styled.p`
+    line-height: 30px;
+    margin-right: 15px;
 `;

@@ -27,9 +27,10 @@ export type Country = string | null;
 const App: React.FC = () => {
   const [patientsSortDirection, setPatientsSortDirection] = useState<SortDirection>(null);
   const [countrySortDirection, setCountrySortDirection] = useState<SortDirection>(null);
-  const [country, setCountry] = useState<string | null>(null);
-  const [showCountries, setShowCountries] = useState<Boolean>(false)
-  const [countriesFiltered, setCountriesFiltered] = useState<Boolean>(false)
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<Country[]>([]);
+  const [showCountries, setShowCountries] = useState<Boolean>(false);
+  const [countriesFiltered, setCountriesFiltered] = useState<Boolean>(false);
 
     return (
       <Layout>
@@ -37,8 +38,8 @@ const App: React.FC = () => {
           <QueryRenderer<AppQuery>
             environment={environment}
             query={graphql`
-          query AppQuery($patientsSortDirection: String, $countrySortDirection: String, $country: String)  {
-            clinicalTrials(patientsSortDirection:$patientsSortDirection, countrySortDirection:$countrySortDirection, country:$country) {
+          query AppQuery($patientsSortDirection: String, $countrySortDirection: String, $countries: [String])  {
+            clinicalTrials(patientsSortDirection:$patientsSortDirection, countrySortDirection:$countrySortDirection, countries:$countries) {
               country
               patients
               site
@@ -49,7 +50,7 @@ const App: React.FC = () => {
             variables={{
               patientsSortDirection,
               countrySortDirection,
-              country
+              countries
             }}
             render={({props}) => {
               if (!props) {
@@ -59,11 +60,13 @@ const App: React.FC = () => {
                                      setPatientsSortDirection={setPatientsSortDirection}
                                      countrySortDirection={countrySortDirection}
                                      setCountrySortDirection={setCountrySortDirection}
-                                     setCountry={setCountry}
+                                     setCountries={setCountries}
                                      showCountries={showCountries}
                                      setShowCountries={setShowCountries}
                                      countriesFiltered={countriesFiltered}
                                      setCountriesFiltered={setCountriesFiltered}
+                                     selectedCountries={selectedCountries}
+                                     setSelectedCountries={setSelectedCountries}
                                      clinicalTrials={props.clinicalTrials}/>;
             }}
           />

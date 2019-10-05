@@ -28,19 +28,19 @@ export const schema = new GraphQLSchema({
           countrySortDirection: {
             type: GraphQLString
           },
-          country: {
-            type: GraphQLString
+          countries: {
+            type: GraphQLList(GraphQLString)
           }
         },
-        resolve: (__, { patientsSortDirection, countrySortDirection, country }) => {
+        resolve: (__, { patientsSortDirection, countrySortDirection, countries }) => {
           let baseQuery = queryBuilder("clinical_trial");
           if (countrySortDirection !== null  && countrySortDirection !== undefined) {
             baseQuery = baseQuery.orderBy("country", countrySortDirection);
           } else if (patientsSortDirection !== null && patientsSortDirection !== undefined) {
             baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
           }
-          if (country !== null && country !== undefined) {
-            baseQuery.where("country", country);
+          if (countries !== null && countries !== undefined && countries.length > 0) {
+            baseQuery.whereIn("country", countries);
           }
           return baseQuery.select();
         }

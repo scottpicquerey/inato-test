@@ -12,10 +12,13 @@ import {
   CountrySelector,
   CountrySelectorBtn,
   CountryTable,
-  CountryCell
+  CountryCell,
+  SelectedCountryCell,
+  SelectedCountriesParagraph
 } from "./style"
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 import { SortDirection, Country } from "./App";
+import { CSSProperties } from "styled-components";
 
 
 interface Props {
@@ -28,8 +31,12 @@ interface Props {
   setCountrySortDirection: (
     countrySortDirection: SortDirection
   ) => void;
-  setCountry: (
-    country: Country
+  setCountries: (
+    countries: Country[]
+  ) => void;
+  selectedCountries: Country[]
+  setSelectedCountries: (
+    selectedCountries: Country[]
   ) => void;
   showCountries: Boolean;
   setShowCountries: (
@@ -47,11 +54,13 @@ const ClinicalTrials: React.FC<Props> = ({
   setPatientsSortDirection,
   countrySortDirection,
   setCountrySortDirection,
-  setCountry,
+  setCountries,
   showCountries,
   setShowCountries,
   countriesFiltered,
-  setCountriesFiltered
+  setCountriesFiltered,
+  selectedCountries,
+  setSelectedCountries
 }: Props) => {
   const toggleSortDirection = useCallback((columnName: string) => {
     if (columnName === "patients") {
@@ -61,16 +70,19 @@ const ClinicalTrials: React.FC<Props> = ({
     }
   }, [patientsSortDirection, setPatientsSortDirection, countrySortDirection, setCountrySortDirection]);
 
-  const toggleCountryFiltering = useCallback((country) => {
-    setCountry(country);
-    setCountriesFiltered(true)
-  }, [setCountry, setCountriesFiltered]);
+  const toggleCountriesFiltering = useCallback(() => {
+    if (selectedCountries.length > 0) {
+      setCountries(selectedCountries);
+      setCountriesFiltered(true)
+    }
+  }, [setCountries, setCountriesFiltered, selectedCountries]);
 
   const toggleResetFiltering = useCallback(() => {
-    setCountry(null);
+    setCountries([]);
     setShowCountries(false)
     setCountriesFiltered(false)
-  }, [setCountry, setShowCountries, setCountriesFiltered])
+    setSelectedCountries([]);
+  }, [setCountries, setShowCountries, setCountriesFiltered, setSelectedCountries])
   
   const getAllCountries = useCallback(() => {
     const countries = _.map(clinicalTrials, "country")
@@ -82,27 +94,54 @@ const ClinicalTrials: React.FC<Props> = ({
     setShowCountries(!showCountries);
   }, [showCountries, setShowCountries]);
 
-  const selectCountry = useCallback((country) => {
-    toggleCountryFiltering(country)
-    setShowCountries(true);
-  }, [setShowCountries, toggleCountryFiltering]);
+  const selectCountry = useCallback((country: string) => {
+    let countries = [...selectedCountries];
+    if (!countries.includes(country)) {
+      countries.push(country);
+    } else {
+      countries = countries.filter(x => x!== country);
+    }
+    setSelectedCountries(countries);
+  }, [selectedCountries, setSelectedCountries]);
   
+  const displaySelectedCountries = useCallback(() => {
+    let inlineCountries = "";
+    selectedCountries.forEach((country, index) => {
+      index === selectedCountries.length - 1 ? inlineCountries += country : inlineCountries += `${country}, `;
+    });
+    return <SelectedCountriesParagraph>Selected countries: {inlineCountries}</SelectedCountriesParagraph>;
+  }, [selectedCountries]);
   return (
     <Fragment>
       <h1>Clinical trials</h1>
       <CountrySelector>
         {
-          countriesFiltered?<p>Filter by country: </p>:<p>Filtered with country:</p>
+          countriesFiltered?
+          <Fragment>
+            {
+              displaySelectedCountries()
+            }
+            <CountrySelectorBtn style={removeMargin} onClick={toggleResetFiltering}>Reset filters</CountrySelectorBtn>
+          </Fragment>:
+          <Fragment>
+            <p>Filter by country: </p>
+            <CountryTable>
+              <CountryCell onClick={displayCountries} key="country-default">Select countries</CountryCell>
+              {
+                getAllCountries().map((country) => {
+                  if (showCountries === true) {
+                    return selectedCountries.includes(country)?
+                    <SelectedCountryCell onClick={() => {selectCountry(country)}} key={country}>{country}</SelectedCountryCell>:
+                    <CountryCell onClick={() => {selectCountry(country)}} key={country}>{country}</CountryCell>
+                  } else {
+                    return null
+                  }
+                })
+              }
+            </CountryTable>
+            <CountrySelectorBtn onClick={toggleCountriesFiltering}>Filter</CountrySelectorBtn>
+          </Fragment>
         }
-        <CountryTable>
-          {
-            countriesFiltered?null:<CountryCell onClick={displayCountries} key="country-default">Select a country</CountryCell>
-          }
-          {
-            getAllCountries().map((country) => showCountries?<CountryCell onClick={() => {selectCountry(country)}} key={country}>{country}</CountryCell>:null)
-          }
-          </CountryTable>
-          <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
       </CountrySelector>
       <Table>
         <Header>
@@ -152,5 +191,10 @@ const sortColumnDirection = (
   }
   setOtherColumnSortDirection(null)
 };
+
+/* CSS Adjustments */
+const removeMargin = {
+  margin: 0
+} as CSSProperties;
 
 export default ClinicalTrials;
