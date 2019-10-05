@@ -6,7 +6,6 @@ import {
   GraphQLString
 } from "graphql";
 import { nodeDefinitions } from "graphql-relay";
-import _ from "lodash"
 
 import { ClinicalTrialType } from "./clinicalTrials";
 import { queryBuilder } from "./database";
@@ -41,8 +40,7 @@ export const schema = new GraphQLSchema({
             baseQuery = baseQuery.orderBy("patients", patientsSortDirection);
           }
           if (country !== null && country !== undefined) {
-            // Use of "ilike" because otherwise, finding countries with spaces (e.g. "United States") was not working
-            baseQuery.where("country", "ilike", _.capitalize(country));
+            baseQuery.where("country", country);
           }
           return baseQuery.select();
         }
