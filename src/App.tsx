@@ -28,6 +28,8 @@ const App: React.FC = () => {
   const [patientsSortDirection, setPatientsSortDirection] = useState<SortDirection>(null);
   const [countrySortDirection, setCountrySortDirection] = useState<SortDirection>(null);
   const [country, setCountry] = useState<string | null>(null);
+  const [showCountries, setShowCountries] = useState<Boolean>(false)
+  const [countriesFiltered, setCountriesFiltered] = useState<Boolean>(false)
 
     return (
       <Layout>
@@ -58,6 +60,10 @@ const App: React.FC = () => {
                                      countrySortDirection={countrySortDirection}
                                      setCountrySortDirection={setCountrySortDirection}
                                      setCountry={setCountry}
+                                     showCountries={showCountries}
+                                     setShowCountries={setShowCountries}
+                                     countriesFiltered={countriesFiltered}
+                                     setCountriesFiltered={setCountriesFiltered}
                                      clinicalTrials={props.clinicalTrials}/>;
             }}
           />

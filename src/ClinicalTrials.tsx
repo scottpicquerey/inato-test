@@ -10,11 +10,13 @@ import {
   ClickableHeaderCell,
   Cell,
   CountrySelector,
-  CountryInput,
-  CountrySelectorBtn
+  CountrySelectorBtn,
+  CountryTable,
+  CountryCell
 } from "./style"
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 import { SortDirection, Country } from "./App";
+
 
 interface Props {
   clinicalTrials: AppQueryResponse["clinicalTrials"];
@@ -29,6 +31,14 @@ interface Props {
   setCountry: (
     country: Country
   ) => void;
+  showCountries: Boolean;
+  setShowCountries: (
+    showCountries: Boolean
+  ) => void;
+  countriesFiltered: Boolean;
+  setCountriesFiltered: (
+    countriesFiltered: Boolean
+  ) => void;
 }
 
 const ClinicalTrials: React.FC<Props> = ({
@@ -37,7 +47,11 @@ const ClinicalTrials: React.FC<Props> = ({
   setPatientsSortDirection,
   countrySortDirection,
   setCountrySortDirection,
-  setCountry
+  setCountry,
+  showCountries,
+  setShowCountries,
+  countriesFiltered,
+  setCountriesFiltered
 }: Props) => {
   const toggleSortDirection = useCallback((columnName: string) => {
     if (columnName === "patients") {
@@ -47,23 +61,48 @@ const ClinicalTrials: React.FC<Props> = ({
     }
   }, [patientsSortDirection, setPatientsSortDirection, countrySortDirection, setCountrySortDirection]);
 
-  const toggleCountryFiltering = useCallback(() => {
-    const inputCountryValue = (document.getElementById("country-input") as HTMLInputElement).value;
-    setCountry(inputCountryValue);
-  }, [setCountry]);
+  const toggleCountryFiltering = useCallback((country) => {
+    setCountry(country);
+    setCountriesFiltered(true)
+  }, [setCountry, setCountriesFiltered]);
 
   const toggleResetFiltering = useCallback(() => {
     setCountry(null);
-  }, [setCountry])
+    setShowCountries(false)
+    setCountriesFiltered(false)
+  }, [setCountry, setShowCountries, setCountriesFiltered])
+  
+  const getAllCountries = useCallback(() => {
+    const countries = _.map(clinicalTrials, "country")
+    const countriesUniq = _.uniq(countries)
+    return _.sortBy(countriesUniq)
+  }, [clinicalTrials]);
+
+  const displayCountries = useCallback(() => {
+    setShowCountries(!showCountries);
+  }, [showCountries, setShowCountries]);
+
+  const selectCountry = useCallback((country) => {
+    toggleCountryFiltering(country)
+    setShowCountries(true);
+  }, [setShowCountries, toggleCountryFiltering]);
   
   return (
     <Fragment>
       <h1>Clinical trials</h1>
       <CountrySelector>
-        <p>Filter by country: </p>
-        <CountryInput autoComplete="off" id="country-input" placeholder="Type a country..."></CountryInput>
-        <CountrySelectorBtn onClick={toggleCountryFiltering}>Filter</CountrySelectorBtn>
-        <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
+        {
+          countriesFiltered?<p>Filter by country: </p>:<p>Filtered with country:</p>
+        }
+        <CountryTable>
+          {
+            countriesFiltered?null:<CountryCell onClick={displayCountries} key="country-default">Select a country</CountryCell>
+          }
+          {
+            getAllCountries().map((country) => showCountries?<CountryCell onClick={() => {selectCountry(country)}} key={country}>{country}</CountryCell>:null)
+          }
+          </CountryTable>
+          <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
       </CountrySelector>
       <Table>
         <Header>
@@ -99,7 +138,11 @@ const sortDirectionIndicator = (
   return "";
 };
 
-const sortColumnDirection = (columnDirection: string | null, setColumnSortDirection: Function, setOtherColumnSortDirection: Function) => {
+const sortColumnDirection = (
+  columnDirection: string | null, 
+  setColumnSortDirection: Function, 
+  setOtherColumnSortDirection: Function
+) => {
   if (columnDirection == null) {
     setColumnSortDirection("asc");
   } else if (columnDirection === "asc") {
