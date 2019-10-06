@@ -63,6 +63,7 @@ export const CountrySelector = styled.div`
 `;
 
 export const CountrySelectorBtn = styled.button`
+    border-radius: 4px;
     height: 35px;
     margin-left: 15px;
     border: 1px solid var(--border-color);
@@ -77,25 +78,44 @@ export const CountrySelectorBtn = styled.button`
     outline: none;
 `;
 
-export const CountryTable = styled.ul`
+export const CountryTableContainer = styled.div`
     width: 230px;
     height: 35px;
+    position: relative;
     margin: 0 0 0 15px;
+    box-sizing: border-box;
+`;
+
+export const CountryTable = styled.ul`
+    width: 100%;
     outline: none;
     font-size: 16px;
-    border: 1px solid var(--border-color);
+    border: 1px solid lightgrey;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    position: relative;
+    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: left;
     cursor: pointer;
     padding: 0;
+    margin: 36px 0 0 0;
+    top: 0;
+    max-height: 280px;
+    overflow: scroll;
+`;
+
+export const CountryCellHeader = styled.li`
+    border-radius: 4px;
+    list-style: none;
+    padding: 8px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ffffff;
 `;
 
 export const CountryCell = styled.li`
@@ -110,10 +130,13 @@ export const CountryCell = styled.li`
     &:not(:first-child):not(:last-child) {
         border-bottom: 1px solid grey;
     }
+    &:hover {
+        background-color: #d4d5d9;
+    }
 `;
 
 export const SelectedCountryCell = styled(CountryCell)`
-    background-color: lightgrey;
+    background-color: #b5b6ba;
 `;
 
 export const SelectedCountriesParagraph = styled.p`

@@ -14,12 +14,13 @@ import {
   CountryTable,
   CountryCell,
   SelectedCountryCell,
-  SelectedCountriesParagraph
+  SelectedCountriesParagraph,
+  CountryTableContainer,
+  CountryCellHeader
 } from "./style"
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 import { SortDirection, Country } from "./App";
 import { CSSProperties } from "styled-components";
-
 
 interface Props {
   clinicalTrials: AppQueryResponse["clinicalTrials"];
@@ -64,30 +65,30 @@ const ClinicalTrials: React.FC<Props> = ({
 }: Props) => {
   const toggleSortDirection = useCallback((columnName: string) => {
     if (columnName === "patients") {
-      sortColumnDirection(patientsSortDirection, setPatientsSortDirection, setCountrySortDirection)
+      sortColumnDirection(patientsSortDirection, setPatientsSortDirection, setCountrySortDirection);
     } else if (columnName === "country") {
-      sortColumnDirection(countrySortDirection, setCountrySortDirection, setPatientsSortDirection)
+      sortColumnDirection(countrySortDirection, setCountrySortDirection, setPatientsSortDirection);
     }
   }, [patientsSortDirection, setPatientsSortDirection, countrySortDirection, setCountrySortDirection]);
 
   const toggleCountriesFiltering = useCallback(() => {
     if (selectedCountries.length > 0) {
       setCountries(selectedCountries);
-      setCountriesFiltered(true)
+      setCountriesFiltered(true);
     }
   }, [setCountries, setCountriesFiltered, selectedCountries]);
 
   const toggleResetFiltering = useCallback(() => {
     setCountries([]);
-    setShowCountries(false)
-    setCountriesFiltered(false)
+    setShowCountries(false);
+    setCountriesFiltered(false);
     setSelectedCountries([]);
-  }, [setCountries, setShowCountries, setCountriesFiltered, setSelectedCountries])
+  }, [setCountries, setShowCountries, setCountriesFiltered, setSelectedCountries]);
   
   const getAllCountries = useCallback(() => {
-    const countries = _.map(clinicalTrials, "country")
-    const countriesUniq = _.uniq(countries)
-    return _.sortBy(countriesUniq)
+    const countries = _.map(clinicalTrials, "country");
+    const countriesUniq = _.uniq(countries);
+    return _.sortBy(countriesUniq);
   }, [clinicalTrials]);
 
   const displayCountries = useCallback(() => {
@@ -109,7 +110,7 @@ const ClinicalTrials: React.FC<Props> = ({
     selectedCountries.forEach((country, index) => {
       index === selectedCountries.length - 1 ? inlineCountries += country : inlineCountries += `${country}, `;
     });
-    return <SelectedCountriesParagraph>Selected countries: {inlineCountries}</SelectedCountriesParagraph>;
+    return <SelectedCountriesParagraph><b>Selected countries:</b> {inlineCountries}</SelectedCountriesParagraph>;
   }, [selectedCountries]);
   return (
     <Fragment>
@@ -125,8 +126,9 @@ const ClinicalTrials: React.FC<Props> = ({
           </Fragment>:
           <Fragment>
             <p>Filter by country: </p>
-            <CountryTable>
-              <CountryCell onClick={displayCountries} key="country-default">Select countries</CountryCell>
+            <CountryTableContainer>
+            <CountryCellHeader onClick={displayCountries} key="country-default">Select countries</CountryCellHeader>
+            <CountryTable style={showCountries?undefined:removeBorder}>
               {
                 getAllCountries().map((country) => {
                   if (showCountries === true) {
@@ -139,6 +141,8 @@ const ClinicalTrials: React.FC<Props> = ({
                 })
               }
             </CountryTable>
+            </CountryTableContainer>
+            
             <CountrySelectorBtn onClick={toggleCountriesFiltering}>Filter</CountrySelectorBtn>
           </Fragment>
         }
@@ -189,7 +193,7 @@ const sortColumnDirection = (
   } else {
     setColumnSortDirection(null);
   }
-  setOtherColumnSortDirection(null)
+  setOtherColumnSortDirection(null);
 };
 
 /* CSS Adjustments */
@@ -197,4 +201,7 @@ const removeMargin = {
   margin: 0
 } as CSSProperties;
 
+const removeBorder = {
+  border: "none"
+} as CSSProperties;
 export default ClinicalTrials;
