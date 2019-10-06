@@ -27,9 +27,9 @@ export type Country = string | null;
 const App: React.FC = () => {
   const [patientsSortDirection, setPatientsSortDirection] = useState<SortDirection>(null);
   const [countrySortDirection, setCountrySortDirection] = useState<SortDirection>(null);
-  const [country, setCountry] = useState<string | null>(null);
-  const [showCountries, setShowCountries] = useState<Boolean>(false)
-  const [countriesFiltered, setCountriesFiltered] = useState<Boolean>(false)
+  const [country, setCountry] = useState<Country>(null);
+  const [showCountries, setShowCountries] = useState<Boolean>(false);
+  const [countriesFiltered, setCountriesFiltered] = useState<Boolean>(false);
 
     return (
       <Layout>

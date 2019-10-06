@@ -12,10 +12,13 @@ import {
   CountrySelector,
   CountrySelectorBtn,
   CountryTable,
-  CountryCell
+  CountryCell,
+  CountryTableContainer,
+  CountryCellHeader
 } from "./style"
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 import { SortDirection, Country } from "./App";
+import { CSSProperties } from "styled-components";
 
 
 interface Props {
@@ -55,63 +58,72 @@ const ClinicalTrials: React.FC<Props> = ({
 }: Props) => {
   const toggleSortDirection = useCallback((columnName: string) => {
     if (columnName === "patients") {
-      sortColumnDirection(patientsSortDirection, setPatientsSortDirection, setCountrySortDirection)
+      sortColumnDirection(patientsSortDirection, setPatientsSortDirection, setCountrySortDirection);
     } else if (columnName === "country") {
-      sortColumnDirection(countrySortDirection, setCountrySortDirection, setPatientsSortDirection)
+      sortColumnDirection(countrySortDirection, setCountrySortDirection, setPatientsSortDirection);
     }
   }, [patientsSortDirection, setPatientsSortDirection, countrySortDirection, setCountrySortDirection]);
 
   const toggleCountryFiltering = useCallback((country) => {
     setCountry(country);
-    setCountriesFiltered(true)
+    setCountriesFiltered(true);
   }, [setCountry, setCountriesFiltered]);
+
+  const selectCountry = useCallback((country) => {
+    toggleCountryFiltering(country);
+    setShowCountries(true);
+  }, [setShowCountries, toggleCountryFiltering]);
 
   const toggleResetFiltering = useCallback(() => {
     setCountry(null);
-    setShowCountries(false)
-    setCountriesFiltered(false)
-  }, [setCountry, setShowCountries, setCountriesFiltered])
-  
-  const getAllCountries = useCallback(() => {
-    const countries = _.map(clinicalTrials, "country")
-    const countriesUniq = _.uniq(countries)
-    return _.sortBy(countriesUniq)
+    setShowCountries(false);
+    setCountriesFiltered(false);
+  }, [setCountry, setShowCountries, setCountriesFiltered]);
+
+  const getQueryCountries = useCallback(() => {
+    const countries = _.map(clinicalTrials, "country");
+    const countriesUniq = _.uniq(countries);
+    return _.sortBy(countriesUniq);
   }, [clinicalTrials]);
 
   const displayCountries = useCallback(() => {
     setShowCountries(!showCountries);
   }, [showCountries, setShowCountries]);
 
-  const selectCountry = useCallback((country) => {
-    toggleCountryFiltering(country)
-    setShowCountries(true);
-  }, [setShowCountries, toggleCountryFiltering]);
-  
   return (
     <Fragment>
       <h1>Clinical trials</h1>
-      <CountrySelector>
-        {
-          countriesFiltered?<p>Filter by country: </p>:<p>Filtered with country:</p>
-        }
-        <CountryTable>
-          {
-            countriesFiltered?null:<CountryCell onClick={displayCountries} key="country-default">Select a country</CountryCell>
-          }
-          {
-            getAllCountries().map((country) => showCountries?<CountryCell onClick={() => {selectCountry(country)}} key={country}>{country}</CountryCell>:null)
-          }
-          </CountryTable>
-          <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
-      </CountrySelector>
+      {
+        countriesFiltered ?
+          <Fragment>
+            <CountrySelector>
+              <p>Country selected: {getQueryCountries()[0]}</p>
+              <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
+            </CountrySelector>
+          </Fragment> :
+          <Fragment>
+            <CountrySelector>
+              <p>Filter by country: </p>
+              <CountryTableContainer>
+                <CountryCellHeader onClick={displayCountries} key="country-default">Select a country</CountryCellHeader>
+                <CountryTable style={showCountries ? undefined : removeBorder}>
+                  {
+                    getQueryCountries().map((country) => showCountries ? <CountryCell onClick={() => { selectCountry(country) }} key={country}>{country}</CountryCell> : null)
+                  }
+                </CountryTable>
+              </CountryTableContainer>
+              <CountrySelectorBtn onClick={toggleResetFiltering}>Reset</CountrySelectorBtn>
+            </CountrySelector>
+          </Fragment>
+      }
       <Table>
         <Header>
           <HeaderCell>site</HeaderCell>
           <HeaderCell>city</HeaderCell>
-          <ClickableHeaderCell onClick={() => {toggleSortDirection("country")}}>
+          <ClickableHeaderCell onClick={() => { toggleSortDirection("country") }}>
             country{sortDirectionIndicator(countrySortDirection)}
           </ClickableHeaderCell>
-          <ClickableHeaderCell onClick={() => {toggleSortDirection("patients")}}>
+          <ClickableHeaderCell onClick={() => { toggleSortDirection("patients") }}>
             patients{sortDirectionIndicator(patientsSortDirection)}
           </ClickableHeaderCell>
         </Header>
@@ -139,8 +151,8 @@ const sortDirectionIndicator = (
 };
 
 const sortColumnDirection = (
-  columnDirection: string | null, 
-  setColumnSortDirection: Function, 
+  columnDirection: string | null,
+  setColumnSortDirection: Function,
   setOtherColumnSortDirection: Function
 ) => {
   if (columnDirection == null) {
@@ -150,7 +162,11 @@ const sortColumnDirection = (
   } else {
     setColumnSortDirection(null);
   }
-  setOtherColumnSortDirection(null)
+  setOtherColumnSortDirection(null);
 };
 
+/* CSS Adjustments */
+const removeBorder = {
+  border: "none"
+} as CSSProperties;
 export default ClinicalTrials;

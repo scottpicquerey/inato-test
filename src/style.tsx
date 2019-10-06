@@ -59,6 +59,7 @@ export const CountrySelector = styled.div`
 `;
 
 export const CountrySelectorBtn = styled.button`
+    border-radius: 4px;
     height: 35px;
     margin-left: 15px;
     border: 1px solid var(--border-color);
@@ -73,26 +74,44 @@ export const CountrySelectorBtn = styled.button`
     outline: none;
 `;
 
-export const CountryTable = styled.ul`
+export const CountryTableContainer = styled.div`
+    position: relative;
     width: 180px;
     height: 35px;
     margin: 0 0 0 15px;
+    cursor: pointer;
+`;
+
+export const CountryTable = styled.ul`
+    width: 100%;    
+    border: 1px solid lightgrey;
+    max-height: 280px;
+    overflow: scroll;
+    margin: 36px 0 0 0;
     outline: none;
     font-size: 16px;
-    border: 1px solid var(--border-color);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    position: relative;
+    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: left;
     background-color: #ffffff;
-    cursor: pointer;
     padding: 0;
+    top: 0;
+`;
+
+export const CountryCellHeader = styled.li`
+    border-radius: 4px;
+    list-style: none;
+    padding: 8px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ffffff;
 `;
 
 export const CountryCell = styled.li`
@@ -106,5 +125,8 @@ export const CountryCell = styled.li`
     }
     &:not(:first-child):not(:last-child) {
         border-bottom: 1px solid grey;
+    }
+    &:hover {
+        background-color: #b5b6ba;
     }
 `;
