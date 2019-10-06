@@ -116,6 +116,7 @@ export const CountryCellHeader = styled.li`
     width: 100%;
     box-sizing: border-box;
     background-color: #ffffff;
+    cursor: pointer;
 `;
 
 export const CountryCell = styled.li`
